@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 void setup() {
   Serial.begin(9600);       // Debugging output to Serial Monitor
   Serial2.begin(115200);    // TFMini-S is connected to Serial2 (pins 7 and 8)
@@ -6,6 +8,9 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  Serial.println("In the loop now");
+  if (Serial2.available()){
+    Serial.println("Data available");
+  }
+  delay(500);
 }
