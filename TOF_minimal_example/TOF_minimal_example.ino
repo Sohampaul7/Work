@@ -1,4 +1,3 @@
-#include <Arduino.h>
 
 void setup() {
   Serial.begin(9600);       // Debugging output to Serial Monitor
@@ -8,7 +7,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("In the loop now");
+  Serial.println("in loop");
   if (Serial2.available()){
     Serial.println("Data available");
   }
