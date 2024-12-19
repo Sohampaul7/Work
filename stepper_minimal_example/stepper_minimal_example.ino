@@ -4,7 +4,7 @@
 
 const float stepPerDegree = 200.0/360.0;
 const float requiredAngle = 360.0;
-const int delayPerStepMicrosec = 500;
+const int delayPerStepMicrosec = 1000; // keep between 1000 to 2400 
 
 void setup() {
   pinMode(STEP_PIN, OUTPUT); // Stepper motor step pin
@@ -29,9 +29,9 @@ void loop() {
   
   for (int stp = 0; stp < requiredAngle*stepPerDegree; stp++) {
     digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(delayPerStepMicrosec); // Adjust speed
+    delayMicroseconds(delayPerStepMicrosec/2); // Adjust speed
     digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(delayPerStepMicrosec);
+    delayMicroseconds(delayPerStepMicrosec/2);
   }
   delay(1000);
 
