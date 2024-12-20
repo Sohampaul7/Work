@@ -27,13 +27,15 @@ void setup() {
 
 void loop() {
   int distance = readDistance();
-  if (distance<10){
-    doNdegrees(10, HIGH);
+  if (distance!=-1){
+    Serial.println(distance);
+    if (distance>10){
+      oneStep(HIGH);
+    }
+    else{
+      oneStep(LOW);
+    }
   }
-  else{
-    doNdegrees(10, LOW);
-  }
-  Serial.println(distance);
 }
 
 void flushSerial(){
@@ -70,8 +72,9 @@ int readDistance(){
   }
 
   //Serial.println(dist);
-  
   flushSerial();
+  delay(1);
+  return -1;
 }
 
 void oneStep(bool motor_direction){
@@ -82,7 +85,13 @@ void oneStep(bool motor_direction){
   delayMicroseconds(delayPerStepMicrosec/2);
   digitalWrite(STEP_PIN, LOW);
   delayMicroseconds(delayPerStepMicrosec/2);
-
+  /*
+  if(motor_direction=LOW){
+    Serial.println("High");
+  }else{
+    Serial.println("Low");
+  }
+*/
 }
 
 void doNsteps(int n, bool motor_direction){
@@ -94,8 +103,9 @@ void doNsteps(int n, bool motor_direction){
 void doNdegrees(float degree, bool motor_direction){
 
   int steps = degree*stepPerDegree;
-  
-  for (int stp=0; stp<steps; stp++){
-    oneStep(motor_direction);
+  if (steps>0){
+    for (int stp=0; stp<steps; stp++){
+      oneStep(motor_direction);
+    }
   }
 }
