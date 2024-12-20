@@ -18,6 +18,8 @@ void setup() {
 void loop() {
   doNdegrees(90, HIGH);
   delay(1000);
+  doNdegrees(90, LOW);
+  delay(1000);
 }
 
 
