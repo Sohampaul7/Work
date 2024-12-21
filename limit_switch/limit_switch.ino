@@ -3,6 +3,7 @@
 #define HEADER 0x59   // Frame starting byte (0x59 for TFMini-S)
 #define BUFFER_SIZE 9 // Size of the data packet
 #define BUTTON_PIN 33  // GPIO pin connected to the button
+#define LIMITSWTICH_PIN 40  // GPIO pin connected to the button
 
 // Variables for ToF sensor
 uint8_t uart[BUFFER_SIZE];
@@ -15,8 +16,10 @@ const int delayPerStepMicrosec = 1000; // keep between 1000 to 2400
 int threshold_distance = 20;
 
 volatile bool stopMotorFlag = false; // Flag to stop the motor
-volatile unsigned long lastDebounceTime = 0; // Track the last debounce time
-const unsigned long debounceDelay = 50;     // Debounce delay in milliseconds
+volatile bool limitswitchMotorFlag = false; // Flag to stop the motor
+volatile unsigned long stopLastDebounceTime = 0; // Track the last debounce time
+volatile unsigned long limitswitchLastDebounceTime = 0; // Track the last debounce time
+const unsigned long debounceDelay = 100;     // Debounce delay in milliseconds
 
 void setup() {
   pinMode(STEP_PIN, OUTPUT); // Stepper motor step pin
@@ -25,8 +28,10 @@ void setup() {
   Serial.begin(9600);       // Debugging output to Serial Monitor
   Serial2.begin(115200);    // TFMini-S is connected to Serial2 (pins 7 and 8)
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);  // Configure button pin with internal pull-up resistor
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), stopButtonPressed, RISING);  // Trigger on falling edge
+  pinMode(BUTTON_PIN, INPUT);  
+  pinMode(LIMITSWTICH_PIN, INPUT);  
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), stopButtonPressed, RISING);  
+  attachInterrupt(digitalPinToInterrupt(LIMITSWTICH_PIN), limitSwitchPressed, RISING);  
 
   Serial.println("Setup complete");
   delay(2000);
@@ -39,9 +44,21 @@ void loop() {
     digitalWrite(STEP_PIN, LOW);  // Stop motor
     delayMicroseconds(delayPerStepMicrosec/2);
     
-    Serial.println("Motor stopped. Press 'r' to restart.");
+    Serial.println("Emergency Stop. Press 'r' to restart.");
     if (Serial.available() && Serial.read() == 'r') {
       stopMotorFlag = false;
+      Serial.println("Motor restarted.");
+    }
+    return;
+  }
+
+  if (limitswitchMotorFlag) {
+    digitalWrite(STEP_PIN, LOW);  // Stop motor
+    delayMicroseconds(delayPerStepMicrosec/2);
+    
+    Serial.println("Limit switch pressed. Press 'r' to restart.");
+    if (Serial.available() && Serial.read() == 'r') {
+      limitswitchMotorFlag = false;
       Serial.println("Motor restarted.");
     }
     return;
@@ -72,9 +89,17 @@ void loop() {
 // ISR to set the flag
 void stopButtonPressed() {
   unsigned long currentTime = millis();
-  if (currentTime - lastDebounceTime > debounceDelay) {
+  if (currentTime - stopLastDebounceTime > debounceDelay) {
     stopMotorFlag = true; // Set flag to stop the motor
-    lastDebounceTime = currentTime;
+    stopLastDebounceTime = currentTime;
+  }
+}
+
+void limitSwitchPressed() {
+  unsigned long currentTime = millis();
+  if (currentTime - limitswitchLastDebounceTime > debounceDelay) {
+    limitswitchMotorFlag = true; // Set flag to stop the motor
+    limitswitchLastDebounceTime = currentTime;
   }
 }
 
