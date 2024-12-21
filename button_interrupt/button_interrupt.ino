@@ -2,7 +2,7 @@
 #define DIR_PIN 4     // Pin connected to stepper motor direction input
 #define HEADER 0x59   // Frame starting byte (0x59 for TFMini-S)
 #define BUFFER_SIZE 9 // Size of the data packet
-#define BUTTON_PIN 2  // GPIO pin connected to the button
+#define BUTTON_PIN 33  // GPIO pin connected to the button
 
 // Variables for ToF sensor
 uint8_t uart[BUFFER_SIZE];
@@ -15,6 +15,8 @@ const int delayPerStepMicrosec = 1000; // keep between 1000 to 2400
 int threshold_distance = 20;
 
 volatile bool stopMotorFlag = false; // Flag to stop the motor
+volatile unsigned long lastDebounceTime = 0; // Track the last debounce time
+const unsigned long debounceDelay = 50;     // Debounce delay in milliseconds
 
 void setup() {
   pinMode(STEP_PIN, OUTPUT); // Stepper motor step pin
@@ -35,6 +37,8 @@ void loop() {
   // Check if motor should be stopped
   if (stopMotorFlag) {
     digitalWrite(STEP_PIN, LOW);  // Stop motor
+    delayMicroseconds(delayPerStepMicrosec/2);
+    
     Serial.println("Motor stopped. Press 'r' to restart.");
     if (Serial.available() && Serial.read() == 'r') {
       stopMotorFlag = false;
@@ -67,7 +71,11 @@ void loop() {
 
 // ISR to set the flag
 void stopButtonPressed() {
-  stopMotorFlag = true; // Set flag to stop the motor
+  unsigned long currentTime = millis();
+  if (currentTime - lastDebounceTime > debounceDelay) {
+    stopMotorFlag = true; // Set flag to stop the motor
+    lastDebounceTime = currentTime;
+  }
 }
 
 void updateThresholdDistance() {
