@@ -15,7 +15,7 @@ int i;
 const float stepPerDegree = 200.0/360.0;
 const float requiredAngle = 360.0;
 const int delayPerStepMicrosec = 1000; // keep between 1000 to 2400 
-int threshold_distance = 20;
+int threshold_distance = 2;
 
 volatile bool stopMotorFlag = false; // Flag to stop the motor
 volatile bool limitswitchMotorFlag = false; // Flag to stop the motor
