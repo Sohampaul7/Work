@@ -1,3 +1,5 @@
+#include <AccelStepper.h>
+
 #define STEP_PIN 3    // Pin connected to stepper motor step input
 #define DIR_PIN 4     // Pin connected to stepper motor direction input
 #define HEADER 0x59   // Frame starting byte (0x59 for TFMini-S)
@@ -21,6 +23,9 @@ volatile unsigned long stopLastDebounceTime = 0; // Track the last debounce time
 volatile unsigned long limitswitchLastDebounceTime = 0; // Track the last debounce time
 const unsigned long debounceDelay = 100;     // Debounce delay in milliseconds
 
+// Create an instance of AccelStepper
+AccelStepper stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
+
 void setup() {
   pinMode(STEP_PIN, OUTPUT); // Stepper motor step pin
   pinMode(DIR_PIN, OUTPUT);  // Stepper motor direction pin
@@ -31,7 +36,12 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT);  
   pinMode(LIMITSWTICH_PIN, INPUT);  
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), stopButtonPressed, RISING);  
-  attachInterrupt(digitalPinToInterrupt(LIMITSWTICH_PIN), limitSwitchPressed, RISING);  
+  attachInterrupt(digitalPinToInterrupt(LIMITSWTICH_PIN), limitSwitchPressed, RISING); 
+
+   
+  // Set the maximum speed and acceleration
+  stepper.setMaxSpeed(500);   // Maximum speed in steps per second
+  stepper.setAcceleration(1000); // Acceleration in steps per second^2
 
   Serial.println("Setup complete");
   delay(2000);
@@ -39,49 +49,46 @@ void setup() {
 
 void loop() {  
   
-  // Check if motor should be stopped
   if (stopMotorFlag) {
-    digitalWrite(STEP_PIN, LOW);  // Stop motor
-    delayMicroseconds(delayPerStepMicrosec/2);
-    
+    stepper.stop();  // Stop the stepper motor
     Serial.println("Emergency Stop. Press 'r' to restart.");
-    if (Serial.available() && Serial.read() == 'r') {
-      stopMotorFlag = false;
-      Serial.println("Motor restarted.");
-    }
+    waitForRestart(); // Wait for restart command
     return;
   }
 
+  // Check for limit switch activation
   if (limitswitchMotorFlag) {
-    digitalWrite(STEP_PIN, LOW);  // Stop motor
-    delayMicroseconds(delayPerStepMicrosec/2);
-    
+    stepper.stop();  // Stop the stepper motor
     Serial.println("Limit switch pressed. Press 'r' to restart.");
-    if (Serial.available() && Serial.read() == 'r') {
-      limitswitchMotorFlag = false;
-      Serial.println("Motor restarted.");
-    }
+    waitForRestart(); // Wait for restart command
     return;
   }
   
   // Update threshold distance from Serial input if available
   updateThresholdDistance();
   
-  int distance = readDistance();
-  
+  int distance = readDistance();  
   
   if (distance!=-1){
-    Serial.print("Measured distance: ");
     Serial.println(distance);
-    if (distance > threshold_distance){
-      oneStep(HIGH);
-    }
-    else if(distance<threshold_distance-10){
-      oneStep(LOW);
-    }
-    else{
-      digitalWrite(STEP_PIN, LOW);
-      delayMicroseconds(delayPerStepMicrosec/2);
+  }
+
+  if (distance!=-1 && distance>threshold_distance){
+    stepper.moveTo(distance);
+  }
+  
+  if (stepper.distanceToGo() != 0) {
+    stepper.run();
+  } 
+}
+
+void waitForRestart() {
+  while (true) {
+    if (Serial.available() && Serial.read() == 'r') {
+      stopMotorFlag = false;
+      limitswitchMotorFlag = false;
+      Serial.println("Motor restarted.");
+      break;
     }
   }
 }
@@ -105,7 +112,9 @@ void limitSwitchPressed() {
 
 void updateThresholdDistance() {
   if (Serial.available()) {
-    int new_distance = Serial.parseInt(); // Parse new value from Serial
+    
+    String input = Serial.readStringUntil('\n');     
+    int new_distance = input.toInt();
 
     if (new_distance > 0) { // Update only if valid value
       threshold_distance = new_distance;
@@ -154,14 +163,4 @@ int readDistance(){
   flushSerial();
   delay(1);
   return -1;
-}
-
-void oneStep(bool motor_direction){
-  
-  digitalWrite(DIR_PIN, motor_direction); 
-  
-  digitalWrite(STEP_PIN, HIGH);
-  delayMicroseconds(delayPerStepMicrosec/2);
-  digitalWrite(STEP_PIN, LOW);
-  delayMicroseconds(delayPerStepMicrosec/2);
 }
