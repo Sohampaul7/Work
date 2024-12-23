@@ -5,24 +5,22 @@ This repository contains minimal examples for testing and experimenting with var
 The project demonstrates how to interface and use a ToF sensor to measure the distance from a mounting point, and how to control a stepper motor to adjust its position so that it maintains a constant reference distance from the ground. These examples are modular, allowing you to test and integrate each component individually and together.
 
 ## Key Features:
-* ToF Sensor Integration: Interface with a ToF sensor to measure distance from the ground.
-* Stepper Motor Control: Use a stepper motor to adjust the position of the object.
-* Push Button Integration: Implement push buttons for emergency stops.
-* Modular Examples: Examples for individual testing of components like the ToF sensor, stepper motor, and buttons.
+* __ToF Sensor Integration__: Interface with a ToF sensor to measure distance from the ground.
+* __Stepper Motor Control__: Use a stepper motor to adjust the position of the object.
+* __Push Button Integration__: Implement push buttons for manual control or triggering actions.
+* __Modular Examples__: Examples for individual testing of components like the ToF sensor, stepper motor, and buttons.
 
 ## Installation
-### 1. Clone the repository:
+ 1. Clone the repository:
 ```
 git clone https://github.com/yourusername/stepper-motor-tof-sensor.git
 cd stepper-motor-tof-sensor
 ```
-### 2. Install the required libraries:
-1. AccelStepper for stepper motor control
+2. Install the required libraries:
+    1. AccelStepper for stepper motor control
 
 
-### 3. Upload the code:
-
-Open the desired example from the examples folder. Upload it to your microcontroller.
+3. Open the desired example from the examples folder. Upload it to your microcontroller.
 
 ## Examples
 The repository contains minimal examples for each component:
@@ -33,13 +31,12 @@ The repository contains minimal examples for each component:
 
 
 ## Usage
-### Controlling Stepper Motor with ToF Sensor:
-
+__Controlling Stepper Motor with ToF Sensor:__
 1. The ToF sensor will measure the distance from the ground.
 2. The stepper motor will adjust its position to maintain a reference distance.
 3. You can modify the reference distance by changing the threshold in the code or via external input like a button.
 
-### Emergency stop with Push Button:
+__Emergency stop with Push Button:__
 You can use push buttons to halt the stepper motor's movements.
 
 ## Wiring diagram
