@@ -7,7 +7,7 @@ The project demonstrates how to interface and use a ToF sensor to measure the di
 ## Key Features:
 * ToF Sensor Integration: Interface with a ToF sensor to measure distance from the ground.
 * Stepper Motor Control: Use a stepper motor to adjust the position of the object.
-* Push Button Integration: Implement push buttons for manual control or triggering actions.
+* Push Button Integration: Implement push buttons for emergency stops.
 * Modular Examples: Examples for individual testing of components like the ToF sensor, stepper motor, and buttons.
 
 ## Installation
