@@ -1,11 +1,11 @@
-
 #define HEADER 0x59   // Frame starting byte (0x59 for TFMini-S)
 #define BUFFER_SIZE 9 // Size of the data packet
 
 // Variables for ToF sensor
-uint8_t uart[BUFFER_SIZE];
-int16_t dist;
-uint8_t chk;
+uint8_t uart_buffer[BUFFER_SIZE];
+int16_t distance_in_cm;
+uint8_t checksum;
+uint8_t reference_checksum = 0xFF;
 int i;
 
 void setup() {
@@ -19,27 +19,27 @@ void loop() {
   // Read distance data from the sensor
   if (Serial2.available()) {
     if (Serial2.read() == HEADER) {
-      uart[0] = HEADER;
+      uart_buffer_buffer[0] = HEADER;
 
       if (Serial2.read() == HEADER) {
-        uart[1] = HEADER;
+        uart_buffer_buffer[1] = HEADER;
 
         for (i = 2; i < BUFFER_SIZE; i++) {
-          uart[i] = Serial2.read();
+          uart_buffer_buffer[i] = Serial2.read();
         }
 
-        // Calculate chksum
-        chk = uart[0] + uart[1] + uart[2] + uart[3] + uart[4] + uart[5] + uart[6] + uart[7];
+        checksum = uart_buffer[0] + uart_buffer[1] + uart_buffer[2] + uart_buffer[3] + uart_buffer[4] + uart_buffer[5] + uart_buffer[6] + uart_buffer[7];
 
-        if (uart[8] == (chk & 0xFF)) {
-          // Calculate distance
-          dist = uart[2] + uart[3] * 256;
+        if (uart_buffer[8] == (checksum & reference_checksum)) {
+          // Calculate distance_in_cm
+          distance_in_cm = uart_buffer[2] + uart_buffer[3] * 256;
+        }
+        else{
+          Serial.println("Checksum error");
         }
       }
     }
   }
-
-  Serial.println(dist);
-
+  Serial.println("Distance: " + String(distance_in_cm) + " cm");
   delay(5);
 }
