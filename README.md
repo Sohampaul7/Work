@@ -7,7 +7,7 @@ The project demonstrates how to interface and use a ToF sensor to measure the di
 ## Key Features:
 * __ToF Sensor Integration__: Interface with a ToF sensor to measure distance from the ground.
 * __Stepper Motor Control__: Use a stepper motor to adjust the position of the object.
-* __Push Button Integration__: Implement push buttons for manual control or triggering actions.
+* __Push Button Integration__: Implement push buttons for emergency stop.
 * __Modular Examples__: Examples for individual testing of components like the ToF sensor, stepper motor, and buttons.
 
 ## Installation
@@ -22,19 +22,29 @@ cd stepper-motor-tof-sensor
 
 3. Open the desired example from the examples folder. Upload it to your microcontroller.
 
-## Examples
-The repository contains minimal examples for each component:
+## Sketches
+The repository contains minimal examples for each component. Below is an overview of each example:
 
-* `ToF_Sensor_Test` : A basic example to read and print distance data from the ToF sensor.
-* `Stepper_Motor_Control`: Controls the stepper motor based on distance measurements.
-* `Push_Button_Control`: Integrates a push button to trigger specific actions.
+1. `accelstepper_minimal_example`: Moves a stepper motor to a target position and reverses direction using AccelStepper.
+2. `accelstepper_motor_sensor`: Controls motor position dynamically based on distance readings from a TFMini-S sensor.
+3. `button_interrupt`: Adds a limit switch and emergency stop functionality to motor control.
+4. `button_interrupt_check`: Uses a button interrupt to stop and restart the motor manually.
+5. `button_stop`: Toggles motor operation with a button while responding to distance thresholds.
+6. `limit_switch`: Implements motor control with ToF data and a button to toggle ON/OFF states.
+7. `limit_switch_accelstepper`: Implements a stepper motor control system using the AccelStepper library, integrating a TFMini-S ToF sensor for distance-based motor positioning with emergency stop and limit switch functionality.
+8. `mk2_sensor_motor_minimal_example`: Provides basic stepper motor control with TFMini-S ToF sensor distance readings, performing single steps based on threshold comparisons.
+9. `ros2_server`: Introduces ROS 2 integration for microcontrollers, enabling real-time communication and action handling for motor and sensor systems.
+10. `send_serial_data`: Combines stepper motor control, sensor feedback, and serial communication to achieve coordinated robotic actuation.
+11. `sensor_motor_minimal_example`: Enables continuous bidirectional rotation of a stepper motor, with dynamic delay adjustments for speed control in each direction.
+12. `stepper_minimal_example`: Extends stepper motor functionality with fine-tuned control over angular movement and speed through programmable microsecond delays.
+13. `TOF_minimal_example`: Reads distance data from a TFMini-S ToF sensor via UART, validating with checksums and converting raw data into centimeter measurements.
 
 
 ## Usage
 __Controlling Stepper Motor with ToF Sensor:__
 1. The ToF sensor will measure the distance from the ground.
 2. The stepper motor will adjust its position to maintain a reference distance.
-3. You can modify the reference distance by changing the threshold in the code or via external input like a button.
+3. You can modify the reference distance by changing the threshold in the code or via a serial monitor.
 
 __Emergency stop with Push Button:__
 You can use push buttons to halt the stepper motor's movements.
@@ -46,13 +56,19 @@ You can use push buttons to halt the stepper motor's movements.
 Feel free to contribute to the project by submitting pull requests. If you find any bugs or have suggestions for improvements, open an issue, and I’ll be happy to review it.
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Authors
+- **Soham Paul**  
+  Primary author of the code. Responsible for designing, implementing, and testing the core functionality.
+
+### Acknowledgments
+- **Eric Schoneberg**  
+  Provided valuable guidance and insights during the development process.
+- **Riyan Cyriac Jose**  
+  Suggested optimizations for better performance and provided guidance throughout the project.
 
 ## License
 For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
 
 # Markdown syntax guide
 

@@ -44,7 +44,6 @@ void setup() {
 }
 
 void loop() {  
-  
   // Check for Emergency Stop activation
   if (stopMotorFlag) {
     stepper.stop();  // Stop the stepper motor
@@ -137,7 +136,6 @@ void flushSerial(){
 }
 
 int readDistance(){
-  
   // Read distance data from the sensor
   if (Serial2.available()) {  // Check if data is available on Serial2
     if (Serial2.read() == HEADER) { // Check if the first byte is the header
