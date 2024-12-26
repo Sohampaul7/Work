@@ -53,8 +53,8 @@ cd stepper-motor-tof-sensor
 2. Test motor movement using `accelstepper_minimal_example`.
 3. Combine ToF sensor feedback with stepper motor control with `mk2_sensor_motor_minimal_example`.
 4. Implement emergency stop or toggle features using `button_interrupt` or `button_stop`.
-5. Test integration of limit switch control using `limit_switch_accelstepper`.
-6. Use `send_serial_data` to transmit sensor and motor data via serial communication.
+5. Use `send_serial_data` to transmit sensor and motor data via serial communication.
+6. Test integration of limit switch with serial communication using `limit_switch_accelstepper`.
 7. Experiment with `ros2_server` to integrate the setup with ROS 2 for advanced communication and control.
 
 ## Examples Overview
@@ -64,8 +64,8 @@ cd stepper-motor-tof-sensor
 | `accelstepper_minimal_example`| Tests basic stepper motor functionality.|AccelStepper Library
 | `mk2_sensor_motor_minimal_example`| Combines ToF sensor readings with stepper motor control in a minimal example. |AccelStepper, TFMini-S
 | `button_interrupt`| Integrates limit switch functionality with stepper motor and ToF sensor.|Push Buttons
-| `limit_switch_accelstepper`| Implements an emergency stop function using button interrupts.|AccelStepper, TFMini-S,Push Buttons
 | `send_serial_data`| Sends real-time sensor and motor data over serial communication.|Serial Communication Tools
+| `limit_switch_accelstepper`| Combines TOF sensor and Stepper motor with serial communication to send threshold value, and implements an emergency stop function using button interrupts.|AccelStepper, TFMini-S, Push Buttons, Serial communication
 | `ros2_server` | Demonstrates ROS 2 integration for real-time communication and control of sensors and motors.|ROS 2 Environment
 
 ## Wiring diagram
