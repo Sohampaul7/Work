@@ -68,16 +68,6 @@ cd stepper-motor-tof-sensor
 | `send_serial_data`| Sends real-time sensor and motor data over serial communication.|Serial Communication Tools
 | `ros2_server` | Demonstrates ROS 2 integration for real-time communication and control of sensors and motors.|ROS 2 Environment
 
-
-## Usage
-__Controlling Stepper Motor with ToF Sensor:__
-1. The ToF sensor will measure the distance from the ground.
-2. The stepper motor will adjust its position to maintain a reference distance.
-3. You can modify the reference distance by changing the threshold in the code or via a serial monitor.
-
-__Emergency stop with Push Button:__
-You can use push buttons to halt the stepper motor's movements.
-
 ## Wiring diagram
 -placeholder-
 
