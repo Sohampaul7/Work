@@ -38,8 +38,9 @@ The project demonstrates how to interface and use a ToF sensor to measure the di
 ## Installation
  1. Clone the repository:
 ```
-git clone https://github.com/yourusername/stepper-motor-tof-sensor.git
-cd stepper-motor-tof-sensor
+git clone https://github.com/Sohampaul7/Work.git
+cd Work
+
 ```
 2. Install the required library:
     * AccelStepper (for stepper motor control)
