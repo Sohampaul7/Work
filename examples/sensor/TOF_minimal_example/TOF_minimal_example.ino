@@ -19,13 +19,13 @@ void loop() {
   // Read distance data from the sensor
   if (Serial2.available()) {
     if (Serial2.read() == HEADER) {
-      uart_buffer_buffer[0] = HEADER;
+      uart_buffer[0] = HEADER;
 
       if (Serial2.read() == HEADER) {
-        uart_buffer_buffer[1] = HEADER;
+        uart_buffer[1] = HEADER;
 
         for (i = 2; i < BUFFER_SIZE; i++) {
-          uart_buffer_buffer[i] = Serial2.read();
+          uart_buffer[i] = Serial2.read();
         }
 
         checksum = uart_buffer[0] + uart_buffer[1] + uart_buffer[2] + uart_buffer[3] + uart_buffer[4] + uart_buffer[5] + uart_buffer[6] + uart_buffer[7];

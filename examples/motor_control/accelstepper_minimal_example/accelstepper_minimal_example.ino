@@ -16,7 +16,7 @@ void setup()
   Serial.begin(9600);       // Debugging output to Serial Monitor
   
   // Move the stepper to a target position
-  stepper.moveTo(200);  // Set the target position in steps
+  stepper.moveTo(10);  // Set the target position in steps
   
   Serial.println("Setup complete");
   Serial.println(stepper.distanceToGo());
@@ -30,7 +30,7 @@ void loop() {
     stepper.run();
   } 
   else{
-    stepper.moveTo(-200);
+    stepper.moveTo(-10);
     Serial.println(stepper.distanceToGo());
   }
 }
