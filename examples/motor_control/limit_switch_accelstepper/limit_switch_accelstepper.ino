@@ -8,12 +8,12 @@
 #define LIMITSWTICH_PIN 40  // GPIO pin connected to pushbutton
 
 // Variables for ToF sensor
-uint8_t uart_buffer_buffer[BUFFER_SIZE];
+uint8_t uart_buffer[BUFFER_SIZE];
 int16_t distance_in_cm;
 uint8_t checksum;
 uint8_t reference_checksum = 0xFF;
 int i;
-int threshold_distance = 2;
+int threshold_distance = 10;
 
 volatile bool stopMotorFlag = false; // Flag to stop the motor
 volatile bool limitswitchMotorFlag = false; // Flag to stop the motor
@@ -67,12 +67,13 @@ void loop() {
   int distance_in_cm = readDistance();  
 
     if (distance_in_cm!=-1){    // Only print valid distances
-    Serial.println(distance_in_cm);
+    // Serial.println(threshold_distance-distance_in_cm);
+    Serial.println(stepper.distanceToGo());
   }
 
   // Check if the distance exceeds the threshold and move the stepper motor accordingly
-  if (distance_in_cm!=-1 && distance_in_cm>threshold_distance){
-    stepper.moveTo(distance_in_cm); // Command the stepper to move to the calculated position
+  if (distance_in_cm!=-1 && distance_in_cm!=threshold_distance){
+    stepper.move(threshold_distance-distance_in_cm); // Command the stepper to move to the calculated position
   }
 
   // Run the stepper motor to reach its target position
