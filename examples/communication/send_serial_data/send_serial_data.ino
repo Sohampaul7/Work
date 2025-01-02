@@ -21,7 +21,6 @@ void setup() {
   Serial2.begin(115200);    // TFMini-S is connected to Serial2 (pins 7 and 8)
 
   Serial.println("Setup complete");
-  delay(2000);
 }
 
 void loop() {  
@@ -34,11 +33,12 @@ void loop() {
   if (distance!=-1){
     Serial.print("Measured distance: ");
     Serial.println(distance);
-    if (distance > threshold_distance){
-      oneStep(HIGH);
-    }
-    else{
+    if (distance != threshold_distance){
+      if (threshold_distance-distance>0){
+        oneStep(HIGH);
+      }else{
       oneStep(LOW);
+      }
     }
   }
 }

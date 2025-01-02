@@ -36,29 +36,7 @@ void setup() {
 void loop() {
   
   float stepPerCm = calibration();
-  
-  // Update threshold distance from Serial input if available
-  updateThresholdDistance();
-  
-  // Read the distance from the sensor
-  int distance_in_cm = readDistance();  
-
-    if (distance_in_cm!=-1){    // Only print valid distances
-    Serial.println(distance_in_cm);
-  }
-
-  // Check if the distance exceeds the threshold and move the stepper motor accordingly
-  if (distance_in_cm!=-1 && distance_in_cm>threshold_distance){
-    stepper.moveTo(-(distance_in_cm-threshold_distance)*stepPerCm); // Command the stepper to move to the calculated position
-  }else if(distance_in_cm!=-1 && distance_in_cm<threshold_distance){
-    stepper.moveTo((distance_in_cm-threshold_distance)*stepPerCm); // Command the stepper to move to the calculated position)
-  }
-
-  // Run the stepper motor to reach its target position
-  if (stepper.distanceToGo() != 0) {
-    stepper.run();  // This function must be called repeatedly in the loop to ensure smooth operation.
-  } 
-  
+    
 }
 
 void countSteps(int& count1, int& count2, int& count3, int initial, int offset) {
@@ -205,7 +183,7 @@ int waitForValidDistance() {
   int distance;
   do {
     distance = readDistance();
-    Serial.println("waiting for valid distance");
+    //Serial.println("waiting for valid distance");
   } while (distance == -1); // Retry until a valid distance is obtained
   return distance;
 }

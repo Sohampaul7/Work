@@ -9,6 +9,8 @@
 #define BUTTON_PIN 40  // GPIO pin connected to pushbutton
 #define LIMITSWTICH_PIN 33  // GPIO pin connected to pushbutton
 
+//TOF green to pin 7
+
 // Variables for ToF sensor
 uint8_t uart_buffer[BUFFER_SIZE];
 int16_t distance;
