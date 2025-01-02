@@ -14,7 +14,7 @@ void setup() {
   pinMode(DIR_PIN, OUTPUT);
   
   // Set the maximum speed and acceleration
-  stepper.setMaxSpeed(500);         // Maximum speed in steps per second
+  stepper.setMaxSpeed(5000);         // Maximum speed in steps per second
   stepper.setAcceleration(1000);   // Acceleration in steps per second^2
   
   Serial.begin(9600); // Initialize serial communication

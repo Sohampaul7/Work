@@ -44,15 +44,11 @@ void loop() {
         // Calculate absolute distance
       int abs_distance = abs(stepper.distanceToGo());
   
-      // Map distance to speed and acceleration
-      int mappedSpeed = map(abs_distance, 0, maxDistance, minSpeed, max_speed);
-  
-      // Ensure values do not exceed their limits
-      mappedSpeed = constrain(mappedSpeed, minSpeed, max_speed);
-  
-      // Set speed and acceleration
-      stepper.setMaxSpeed(mappedSpeed);
-      
+
+      int mappedSpeed = map(abs_distance, 0, maxDistance, minSpeed, max_speed);// Map distance to speed
+      mappedSpeed = constrain(mappedSpeed, minSpeed, max_speed);// Ensure values do not exceed their limits
+      stepper.setMaxSpeed(mappedSpeed);// Set speed
+
       stepper.run();
     }
 
