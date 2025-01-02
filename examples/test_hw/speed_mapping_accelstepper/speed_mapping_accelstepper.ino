@@ -36,27 +36,23 @@ void loop() {
       Serial.read();
     }
 
-    // Calculate absolute distance
-    int abs_distance = abs(reference_distance);
-
-    // Map distance to speed and acceleration
-    int mappedSpeed = map(abs_distance, 0, maxDistance, minSpeed, max_speed);
-
-    // Ensure values do not exceed their limits
-    mappedSpeed = constrain(mappedSpeed, minSpeed, max_speed);
-
-    // Set speed and acceleration
-    stepper.setMaxSpeed(mappedSpeed);
-
-    // Debug output
-    Serial.print("Mapped Speed: ");
-    Serial.println(mappedSpeed);
-
     // Move the stepper motor by the reference distance
     stepper.move(reference_distance);
 
     // Run the stepper until the movement is completed
     while (stepper.distanceToGo() != 0) {
+        // Calculate absolute distance
+      int abs_distance = abs(stepper.distanceToGo());
+  
+      // Map distance to speed and acceleration
+      int mappedSpeed = map(abs_distance, 0, maxDistance, minSpeed, max_speed);
+  
+      // Ensure values do not exceed their limits
+      mappedSpeed = constrain(mappedSpeed, minSpeed, max_speed);
+  
+      // Set speed and acceleration
+      stepper.setMaxSpeed(mappedSpeed);
+      
       stepper.run();
     }
 
