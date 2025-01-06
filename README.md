@@ -29,10 +29,10 @@ The project demonstrates how to interface and use a ToF sensor to measure the di
 │   │   ├── button_stop
 │   │   └── limit_switch
 │   ├── sensor/
-│   │   ├── TOF_minimal_example
+│   │   └── TOF_minimal_example
 │   ├── communication/
 │   │   ├── ros2_server
-│   │   ├── send_serial_data
+│   │   └── send_serial_data
 │   └── test_hw/
 │       ├──tof_speed_mapping
 │       ├──speed_mapping_accelstepper
