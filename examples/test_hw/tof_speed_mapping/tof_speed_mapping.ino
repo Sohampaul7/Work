@@ -108,7 +108,8 @@ void loop() {
 /*
     int mappedSpeed = map(abs_distance, 0, maxDistance, minSpeed, max_speed);// Map distance to speed
     mappedSpeed = constrain(mappedSpeed, minSpeed, max_speed);// Ensure values do not exceed their limits
-    stepper.setMaxSpeed(mappedSpeed);// Set speed
+    stepper.setSpeed(mappedSpeed);// Set speed
+    stepper.runSpeed();
 */
     stepper.run();
   }
