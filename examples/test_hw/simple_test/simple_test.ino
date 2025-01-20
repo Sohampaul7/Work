@@ -1,34 +1,23 @@
 #include <AccelStepper.h>
 
-// Define stepper motor pins
-#define STEP_PIN 3
-#define DIR_PIN 4
-#define ENABLE_PIN 8 // Motor driver enable pin
-
 // Define TFMini-S sensor parameters
 #define HEADER 0x59   // Frame starting byte (0x59 for TFMini-S)
 #define BUFFER_SIZE 9 // Data packet size
 
-// Define input pins
-#define BUTTON_PIN 40       // Emergency stop button pin
-#define LIMIT_SWITCH_PIN 33 // Limit switch pin
+#define STEP_PIN 3    // Pin connected to stepper motor step input
+#define DIR_PIN 4     // Pin connected to stepper motor direction input
+
+int reference_distance = 0; // Distance to move in steps
 
 // Variables for TFMini-S sensor
 uint8_t uart_buffer[BUFFER_SIZE];
-int16_t distance;
+int16_t distance_in_cm;
 uint8_t checksum;
+uint8_t reference_checksum = 0xFF;
+int i;
 int input_distance = 10; // Target distance in cm
 
-// Emergency and limit switch flags
-volatile bool stopMotorFlag = false;
-volatile bool limitSwitchFlag = false;
-
-// Debounce timing
-volatile unsigned long stopLastDebounceTime = 0;
-volatile unsigned long limitSwitchLastDebounceTime = 0;
-const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
-
-// Create AccelStepper instance
+// Create an instance of AccelStepper
 AccelStepper stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
 
 // Speed and acceleration settings
@@ -37,57 +26,49 @@ const int max_speed = 1000;    // Maximum speed (steps/sec)
 const int maxDistance = 650;  // Maximum distance (steps)
 
 void setup() {
-  // Motor driver setup
-  pinMode(ENABLE_PIN, OUTPUT);
-  digitalWrite(ENABLE_PIN, LOW); // Enable motor driver
-  stepper.setMaxSpeed(max_speed);
-
-  // Serial setup
-  Serial.begin(9600);      // Debug output
+  // Initialize stepper motor pins
+  pinMode(STEP_PIN, OUTPUT);
+  pinMode(DIR_PIN, OUTPUT);
+  
+  // Set the maximum speed and acceleration
+  stepper.setMaxSpeed(5000);         // Maximum speed in steps per second
+  
+  Serial.begin(9600); // Initialize serial communication
   Serial2.begin(115200);   // TFMini-S connected to Serial2
-
-  // Input pin setup
-  pinMode(BUTTON_PIN, INPUT);
-  pinMode(LIMIT_SWITCH_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), stopButtonISR, RISING);
-  attachInterrupt(digitalPinToInterrupt(LIMIT_SWITCH_PIN), limitSwitchISR, RISING);
-
-  Serial.println("Setup complete");
   delay(2000);
+  Serial.println("Setup complete. Enter the reference distance:");
 }
 
 void loop() {
-  // Check for restart
-  checkRestart();
-
-  // Handle emergency stop or limit switch activation
-  if (stopMotorFlag || limitSwitchFlag) {
-    stepper.stop();
-    Serial.println(stopMotorFlag ? "Emergency Stop activated. Press 'r' to restart." : "Limit switch activated. Press 'r' to restart.");
-    return;
-  }
-
   // Get user input for target distance
   updateTargetDistance();
 
   // Read current distance from ToF sensor
   int currentDistance = readDistance();
+    
   if (currentDistance != -1) {
     Serial.print("Current Distance: ");
     Serial.println(currentDistance);
   }
-
-  // Move motor to adjust distance
+  
+    // Move motor to adjust distance
   if (currentDistance != -1 && currentDistance != input_distance) {
     int steps = calculateSteps(currentDistance);
     stepper.move(steps);
   }
 
+  stepper.run();
+
+/*
   // Execute motor movement
   while (stepper.distanceToGo() != 0) {
     adjustSpeed();
     stepper.runSpeed();
   }
+*/
+
+  Serial.print("Current Distance: ");
+  Serial.println(currentDistance);
 }
 
 // Convert distance difference to steps
@@ -111,23 +92,24 @@ void updateTargetDistance() {
   }
 }
 
-// Read distance from TFMini-S sensor
-int readDistance() {
+int readDistance(){
+  // Read distance data from the sensor
   if (Serial2.available()) {
     if (Serial2.read() == HEADER) {
       uart_buffer[0] = HEADER;
+
       if (Serial2.read() == HEADER) {
         uart_buffer[1] = HEADER;
-        for (int i = 2; i < BUFFER_SIZE; i++) {
+
+        for (i = 2; i < BUFFER_SIZE; i++) {
           uart_buffer[i] = Serial2.read();
         }
-        checksum = 0;
-        for (int i = 0; i < BUFFER_SIZE - 1; i++) {
-          checksum += uart_buffer[i];
-        }
-        if ((checksum & 0xFF) == uart_buffer[8]) {
-          distance = uart_buffer[2] + (uart_buffer[3] << 8);
-          return distance;
+
+        checksum = uart_buffer[0] + uart_buffer[1] + uart_buffer[2] + uart_buffer[3] + uart_buffer[4] + uart_buffer[5] + uart_buffer[6] + uart_buffer[7];
+
+        if (uart_buffer[8] == (checksum & reference_checksum)) {
+          // Calculate distance_in_cm
+          return distance_in_cm = uart_buffer[2] + uart_buffer[3] * 256;
         }
       }
     }
@@ -150,29 +132,4 @@ void adjustSpeed() {
                         ? map(remainingSteps, -calculateSteps(input_distance), 0, -max_speed, -min_speed)
                         : map(remainingSteps, 0, maxDistance, min_speed, max_speed);
   stepper.setSpeed(constrain(mappedSpeed, -max_speed, max_speed));
-}
-
-// Check for restart command
-void checkRestart() {
-  if (Serial.available() && Serial.read() == 'r') {
-    stopMotorFlag = false;
-    limitSwitchFlag = false;
-    Serial.println("Motor restarted.");
-  }
-}
-
-// Emergency stop InterruptServiceRoutine
-void stopButtonISR() {
-  if (millis() - stopLastDebounceTime > debounceDelay) {
-    stopMotorFlag = true;
-    stopLastDebounceTime = millis();
-  }
-}
-
-// Limit switch InterruptServiceRoutine
-void limitSwitchISR() {
-  if (millis() - limitSwitchLastDebounceTime > debounceDelay) {
-    limitSwitchFlag = true;
-    limitSwitchLastDebounceTime = millis();
-  }
 }

@@ -1,0 +1,88 @@
+import rclpy
+from rclpy.node import Node
+from rclpy.action import ActionServer
+from teensy_button.action import SendValue
+
+import serial
+import time
+
+
+class TeensyActionServer(Node):
+    def __init__(self):
+        super().__init__('teensy_action_server')
+        self._action_server = ActionServer(
+            self,
+            SendValue,
+            'send_value',
+            execute_callback=self.execute_callback,
+        )
+        # Initialize serial communication
+        try:
+            self.serial = serial.Serial('/dev/ttyACM0', 9600, timeout=1)  # Adjust port as necessary
+            self.get_logger().info("Connected to Teensy over serial")
+        except serial.SerialException as e:
+            self.get_logger().error(f"Failed to connect to Teensy: {e}")
+            self.serial = None
+
+    async def execute_callback(self, goal_handle):
+        self.get_logger().info(f"Executing goal: {goal_handle.request.value}")
+
+        if not self.serial:
+            goal_handle.abort()
+            return SendValue.Result(success=False)
+
+        # Send the goal value to the Teensy
+        try:
+            self.serial.write(f"{goal_handle.request.value}\n".encode())
+            self.serial.flush()
+        except Exception as e:
+            self.get_logger().error(f"Error sending to Teensy: {e}")
+            goal_handle.abort()
+            return SendValue.Result(success=False)
+
+        # Countdown simulation with periodic feedback
+        countdown_value = goal_handle.request.value
+        while countdown_value > 0:
+            time.sleep(1)  # Simulate a delay
+            countdown_value -= 1
+            feedback_message = f"Countdown: {countdown_value}"
+            self.get_logger().info(feedback_message)
+            goal_handle.publish_feedback(SendValue.Feedback(feedback=feedback_message))
+
+            # Check for button press during countdown
+            if self.serial.in_waiting > 0:
+                feedback = self.serial.readline().decode().strip()
+                if feedback == "BUTTON_PRESSED":
+                    self.get_logger().info("Button pressed on Teensy, pausing countdown...")
+                    goal_handle.publish_feedback(SendValue.Feedback(feedback="Button pressed, waiting for reset"))
+                    while True:
+                        if self.serial.in_waiting > 0:
+                            reset_feedback = self.serial.readline().decode().strip()
+                            if reset_feedback == "RESET":
+                                self.get_logger().info("Teensy reset, resuming countdown...")
+                                break
+                        time.sleep(0.1)  # Avoid busy-waiting
+
+        # Goal reached
+        self.get_logger().info("Countdown complete!")
+        goal_handle.succeed()
+        return SendValue.Result(success=True)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = TeensyActionServer()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if node.serial:
+            node.serial.close()
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+

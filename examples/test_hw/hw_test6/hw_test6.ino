@@ -17,6 +17,7 @@ int16_t distance;
 uint8_t checksum;
 int i;
 int input_distance = 10;
+int error=0;
 
 volatile bool stopMotorFlag = false; // Flag to stop the motor
 volatile bool limitswitchMotorFlag = false; // Flag to stop the motor
@@ -79,12 +80,13 @@ void loop() {
   int distance = readDistance();
   
   if (distance!=-1){
-    Serial.println(distance);
+    Serial.println(error);
   }
   
   // Check if the distance exceeds the threshold and move the stepper motor accordingly
   if (distance!=-1 && distance != input_distance){
-    stepper.move(input_distance - distance); // Command the stepper to move to the calculated position
+    error = input_distance - distance;
+    stepper.move(error); // Command the stepper to move to the calculated position
   }
 
   // Run the stepper motor to reach its target position

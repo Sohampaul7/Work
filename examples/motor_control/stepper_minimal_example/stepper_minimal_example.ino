@@ -4,20 +4,20 @@
 
 const float stepPerDegree = 200.0/360.0;
 const float requiredAngle = 360.0;
-const int delayPerStepMicrosec = 1000; // keep between 1000 to 2400 
+const int delayPerStepMicrosec = 2400; // keep between 1000 to 2400 
 
 void setup() {
   pinMode(STEP_PIN, OUTPUT); // Stepper motor step pin
   pinMode(DIR_PIN, OUTPUT);  // Stepper motor direction pin
 
   Serial.println("Setup complete");
-  delay(5000);
+  delay(1000);
 }
 
 void loop() {
 
   digitalWrite(DIR_PIN, HIGH); 
-  
+  Serial.println("Up");
   for (int stp = 0; stp < requiredAngle*stepPerDegree; stp++) {
     digitalWrite(STEP_PIN, HIGH);
     delayMicroseconds(delayPerStepMicrosec); // Adjust speed
@@ -26,7 +26,7 @@ void loop() {
   }
   delay(1000);
   digitalWrite(DIR_PIN, LOW); 
-  
+  Serial.println("Down");
   for (int stp = 0; stp < requiredAngle*stepPerDegree; stp++) {
     digitalWrite(STEP_PIN, HIGH);
     delayMicroseconds(delayPerStepMicrosec/2); // Adjust speed
